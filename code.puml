@@ -1,0 +1,73 @@
+@startuml Clean Architecture
+
+' Style and theme
+!theme plain
+skinparam backgroundColor transparent
+skinparam componentStyle rectangle
+
+' Layers
+package "Interfaces Layer" {
+  [Requests] as requests
+  [Responses] as responses
+  interface "Repository" as repo_interface
+}
+
+package "Use Cases Layer" {
+  [ListUsers] as list_users
+  [CreateUser] as create_user
+  [UpdateUser] as update_user
+  [CreateOrganisation] as create_org
+  [CreateDomain] as create_domain
+}
+
+package "Domain Layer" {
+  [User] as user_domain
+  [Organisation] as org_domain
+  [Domain] as domain_domain
+}
+
+package "Infrastructure Layer" {
+  [DjangoUserRepository] as django_user_repo
+  [DjangoOrganisationRepository] as django_org_repo
+  [DjangoDomainRepository] as django_domain_repo
+}
+
+' Relationships
+requests --> list_users
+requests --> create_user
+requests --> update_user
+requests --> create_org
+requests --> create_domain
+
+responses <-- list_users
+responses <-- create_user
+responses <-- update_user
+responses <-- create_org
+responses <-- create_domain
+
+list_users --> user_domain
+create_user --> user_domain
+update_user --> user_domain
+create_org --> org_domain
+create_domain --> domain_domain
+
+django_user_repo ..|> repo_interface
+django_org_repo ..|> repo_interface
+django_domain_repo ..|> repo_interface
+
+django_user_repo --> user_domain
+django_org_repo --> org_domain
+django_domain_repo --> domain_domain
+
+' Notes
+note right of repo_interface
+  Repository interface defines
+  abstract methods for data access
+end note
+
+note bottom of "Infrastructure Layer"
+  Django implementations handle
+  actual database operations
+end note
+
+@enduml
